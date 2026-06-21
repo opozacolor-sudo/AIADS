@@ -1,65 +1,153 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaTiktok,
+  FaYoutube,
+  FaGoogle,
+  FaLinkedinIn,
+  FaWhatsapp,
+} from "react-icons/fa";
+
+const platforms = [
+  { name: "Facebook", icon: FaFacebookF, color: "#1877F2" },
+  { name: "Instagram", icon: FaInstagram, color: "#E4405F" },
+  { name: "TikTok", icon: FaTiktok, color: "#000000" },
+  { name: "YouTube", icon: FaYoutube, color: "#FF0000" },
+  { name: "Google", icon: FaGoogle, color: "#4285F4" },
+  { name: "LinkedIn", icon: FaLinkedinIn, color: "#0A66C2" },
+  { name: "WhatsApp", icon: FaWhatsapp, color: "#25D366" },
+];
+
+export default function SplashPage() {
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+      setTimeout(() => router.push("/login"), 600);
+    }, 4200);
+    return () => clearTimeout(timer);
+  }, [router]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <AnimatePresence>
+      {loading && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6 }}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white overflow-hidden"
+        >
+          <div
+            className="relative"
+            style={{
+              width: "220px",
+              height: "420px",
+              perspective: "1200px",
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            {platforms.map((platform, i) => {
+              const Icon = platform.icon;
+              const offsetY = i * 46;
+              const offsetX = Math.sin(i * 0.9) * 26;
+              const tiltZ = Math.sin(i * 1.3) * 10;
+
+              return (
+                <motion.div
+                  key={platform.name}
+                  className="absolute left-1/2"
+                  style={{
+                    top: offsetY,
+                    width: "120px",
+                    height: "120px",
+                    marginLeft: "-60px",
+                    transformStyle: "preserve-3d",
+                  }}
+                  initial={{
+                    opacity: 0,
+                    x: offsetX,
+                    rotateZ: tiltZ,
+                    rotateY: 0,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    x: offsetX,
+                    rotateZ: tiltZ,
+                    rotateY: 360,
+                  }}
+                  transition={{
+                    opacity: { duration: 0.5, delay: i * 0.12 },
+                    rotateY: {
+                      duration: 2.6,
+                      repeat: Infinity,
+                      ease: "linear",
+                      delay: i * 0.12 + 0.4,
+                    },
+                  }}
+                >
+                  <div
+                    className="absolute inset-0 rounded-full flex items-center justify-center shadow-xl"
+                    style={{
+                      background: `linear-gradient(135deg, ${platform.color} 0%, #FD8A6B 100%)`,
+                      backfaceVisibility: "hidden",
+                    }}
+                  >
+                    <Icon className="text-white" style={{ fontSize: "42px" }} />
+                  </div>
+                  <div
+                    className="absolute inset-0 rounded-full flex items-center justify-center shadow-xl"
+                    style={{
+                      background: `linear-gradient(135deg, #FD8A6B 0%, ${platform.color} 100%)`,
+                      backfaceVisibility: "hidden",
+                      transform: "rotateY(180deg)",
+                    }}
+                  >
+                    <Icon className="text-white" style={{ fontSize: "42px" }} />
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.7 }}
+            className="text-3xl font-bold tracking-tight mt-10"
+            style={{ color: "#FD1843" }}
+          >
+            AIADS
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, duration: 0.7 }}
+            className="text-gray-500 mt-2"
+          >
+            Reclame într-o secundă
+          </motion.p>
+
+          <motion.div
+            className="mt-8 h-1 rounded-full overflow-hidden w-48 bg-gray-100"
+          >
+            <motion.div
+              className="h-full rounded-full"
+              style={{
+                background: "linear-gradient(90deg, #FD1843, #FD8A6B)",
+              }}
+              animate={{ width: ["0%", "100%"] }}
+              transition={{ duration: 3.8, ease: "easeInOut" }}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
